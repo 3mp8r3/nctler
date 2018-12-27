@@ -86,56 +86,56 @@ func (handler *EventHandler) GetPluginName() string {
 func (handler *EventHandler) handleContainerEvent() {
 	logrus.Infof("------------handleContainerEvent started------------------")
 	eventChan := make(chan events.Message, chan_length)
-	redis_client, err := utils.GetRedisClient()
+	redisCli, err := utils.GetRedisClient()
 	if err != nil {
 		logrus.Errorf("New Redis Client error: %v", err)
 		panic("connect to redis error")
 	}
-	docker_cli, err := client.NewClient(docker_endpoint, docker_version, nil, nil)
+	dockerCli, err := client.NewClient(docker_endpoint, docker_version, nil, nil)
 	if err != nil {
 		logrus.Errorf("New Docker Client error: %v", err)
 	}
-	go handler.writeEventChan(docker_cli, eventChan)
+	go handler.writeEventChan(dockerCli, eventChan)
 	for {
 		select {
 		case event := <-eventChan:
 			logrus.Infof("start handle event: %s", event)
-			go handler.dealEvent(redis_client, docker_cli, event)
+			go handler.dealEvent(redisCli, dockerCli, event)
 		}
 	}
 
 }
 
-func (handler *EventHandler) dealEvent(redis_client *redis.Client, cli *client.Client, event events.Message) error {
+func (handler *EventHandler) dealEvent(redisCli *redis.Client, cli *client.Client, event events.Message) error {
 	logrus.Infof("Dealing docker  %s event.", event.Action)
-	c_json, err := cli.ContainerInspect(context.Background(), event.ID)
+	cJSON, err := cli.ContainerInspect(context.Background(), event.ID)
 	if err != nil {
 		logrus.Errorf("inspect container error: %v", err)
 		return err
 	}
-	compact_contianerid := c_json.ID[:12]
-	logrus.Infof("container_json: %v", c_json)
+	compactCID := cJSON.ID[:12]
+	logrus.Infof("container_json: %v", cJSON)
 	if event.Action == "start" {
-		logrus.Infof("container %s started", c_json.ID)
-		info, err := containerInfoForStart(cli, c_json)
+		logrus.Infof("container %s started", cJSON.ID)
+		info, err := containerInfoForStart(cli, cJSON)
 		if info != nil {
-			err = redis_client.Set(REDIS_TASKID_PREFIX+info["taskid"].(string), compact_contianerid, 0).Err()
+			err = redisCli.Set(REDIS_TASKID_PREFIX+info["taskid"].(string), compactCID, 0).Err()
 			logrus.Infof("insert into redis: key: %s, val: %s, err: %v",
-				REDIS_TASKID_PREFIX+info["taskid"].(string), compact_contianerid, err)
-			err = redis_client.HMSet(REDIS_CONTAINERID_PREFIX+compact_contianerid, info).Err()
+				REDIS_TASKID_PREFIX+info["taskid"].(string), compactCID, err)
+			err = redisCli.HMSet(REDIS_CONTAINERID_PREFIX+compactCID, info).Err()
 			logrus.Infof("insert into redis: key: %s, val: %s, err: %v",
-				REDIS_CONTAINERID_PREFIX+compact_contianerid, info, err)
+				REDIS_CONTAINERID_PREFIX+compactCID, info, err)
 		}
 	} else if event.Action == "stop" || event.Action == "kill" {
-		logrus.Infof("container %s %sed", c_json.ID, event.Action)
-		// compact_contianerid := c_json.ID[:12]
-		taskid, err := redis_client.HGet(REDIS_CONTAINERID_PREFIX+compact_contianerid, "taskid").Result()
+		logrus.Infof("container %s %sed", cJSON.ID, event.Action)
+		// compactCID := cJSON.ID[:12]
+		taskid, err := redisCli.HGet(REDIS_CONTAINERID_PREFIX+compactCID, "taskid").Result()
 		if err != nil {
 			logrus.Warningf("<container %s>, get container taskid err: %v", event.Action, err)
 			return err
 		}
-		res, err := redis_client.Del(REDIS_TASKID_PREFIX+taskid, REDIS_CONTAINERID_PREFIX+compact_contianerid).Result()
-		logrus.Infof("delete redis key: [%s, %s], res: %v, err: %v", REDIS_TASKID_PREFIX+taskid, REDIS_CONTAINERID_PREFIX+compact_contianerid, res, err)
+		res, err := redisCli.Del(REDIS_TASKID_PREFIX+taskid, REDIS_CONTAINERID_PREFIX+compactCID).Result()
+		logrus.Infof("delete redis key: [%s, %s], res: %v, err: %v", REDIS_TASKID_PREFIX+taskid, REDIS_CONTAINERID_PREFIX+compactCID, res, err)
 	}
 	return nil
 }
@@ -177,41 +177,41 @@ func (handler *EventHandler) writeEventChan(cli *client.Client, eventChan chan e
 
 }
 
-func containerInfoForStart(cli *client.Client, c_json types.ContainerJSON) (map[string]interface{}, error) {
-	containerid := c_json.ID
-	mounts := c_json.Mounts
+func containerInfoForStart(cli *client.Client, cJSON types.ContainerJSON) (map[string]interface{}, error) {
+	containerid := cJSON.ID
+	mounts := cJSON.Mounts
 	logrus.Infof("mounts: %v", mounts)
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = ""
 	}
-	config := c_json.Config
-	app_id, taskid, appname := "", "", "app.tar"
+	config := cJSON.Config
+	appid, taskid, appname := "", "", "app.tar"
 	// default checkproto COMMAND
 	checkproto, checkpath := "COMMAND", ""
 	hostpath, exists, md5, buildnum := "", "0", "", ""
 
 	logrus.Infof("-----------env")
 	for _, e := range config.Env {
-		e_array := strings.Split(e, "=")
-		if e_array[0] == "MARATHON_APP_ID" {
-			logrus.Infof("MARATHON_APP_ID: %s", e_array[1])
-			app_info := strings.Split(e_array[1], ".")
-			app_id = strings.Trim(app_info[0], "/")
-		} else if e_array[0] == "PACKAGE_CHECK_PROTO" {
-			if e_array[1] == "HTTP" || e_array[1] == "COMMAND" {
-				checkproto = e_array[1]
+		eArray := strings.Split(e, "=")
+		if eArray[0] == "MARATHON_APP_ID" {
+			logrus.Infof("MARATHON_APP_ID: %s", eArray[1])
+			appInfo := strings.Split(eArray[1], ".")
+			appid = strings.Trim(appInfo[0], "/")
+		} else if eArray[0] == "PACKAGE_CHECK_PROTO" {
+			if eArray[1] == "HTTP" || eArray[1] == "COMMAND" {
+				checkproto = eArray[1]
 				logrus.Infof("PACKAGE_CHECK_PROTO: %s", checkproto)
 			} else {
 				checkproto = ""
 				logrus.Infof("PACKAGE_CHECK_PROTO: %s", "None")
 			}
-		} else if e_array[0] == "PACKAGE_CHECK_PATH" {
-			checkpath = e_array[1]
-		} else if e_array[0] == "MESOS_TASK_ID" {
-			taskid = e_array[1]
-		} else if e_array[0] == "PKG" {
-			appname = e_array[1]
+		} else if eArray[0] == "PACKAGE_CHECK_PATH" {
+			checkpath = eArray[1]
+		} else if eArray[0] == "MESOS_TASK_ID" {
+			taskid = eArray[1]
+		} else if eArray[0] == "PKG" {
+			appname = eArray[1]
 		}
 	}
 
@@ -261,7 +261,7 @@ func containerInfoForStart(cli *client.Client, c_json types.ContainerJSON) (map[
 			}
 		}
 	}
-	logrus.Infof("---appid: %s", app_id)
+	logrus.Infof("---appid: %s", appid)
 	outaddr := strings.Trim(conf.Getv("REDIS_ADDR"), "http://")
 	host, err := utils.GetIpAddr(outaddr)
 	logrus.Infof("-----host: %s", host)
@@ -273,7 +273,7 @@ func containerInfoForStart(cli *client.Client, c_json types.ContainerJSON) (map[
 	info["taskid"] = taskid
 	info["buildnum"] = buildnum
 	info["containerid"] = containerid[:12]
-	info["appid"] = app_id
+	info["appid"] = appid
 	info["checkpath"] = checkpath
 	info["checkproto"] = checkproto
 	info["exists"] = exists
@@ -307,7 +307,7 @@ func (handler *EventHandler) handleStartContainer_0() {
 	// }
 
 	// dec := json.NewDecoder(body)
-	influxdb_cli, err := utils.GetInfluxDBWriteClient()
+	influxCli, err := utils.GetInfluxDBWriteClient()
 	for {
 		select {
 		case err := <-errs:
@@ -316,17 +316,17 @@ func (handler *EventHandler) handleStartContainer_0() {
 			}
 		case event := <-messages:
 			logrus.Infof("docker event message: %v", event)
-			c_json, err := cli.ContainerInspect(context.Background(), event.ID)
+			cJSON, err := cli.ContainerInspect(context.Background(), event.ID)
 			if err != nil {
 				logrus.Errorf("inspect container error: %v", err)
 				continue
 			}
-			logrus.Infof("container_json: ", c_json)
-			tags, field, err := containerInfoForStart_0(cli, c_json)
+			logrus.Infof("container_json: ", cJSON)
+			tags, field, err := containerInfoForStart_0(cli, cJSON)
 			if tags != nil {
 				measurement := "app_version"
 				logrus.Infof("influxdb measurement: %s, tags: %v, field: %v", measurement, tags, field)
-				ok, err := utils.WriteData(influxdb_cli, measurement, tags, field, time.Now())
+				ok, err := utils.WriteData(influxCli, measurement, tags, field, time.Now())
 				logrus.Infof("influxdb writedata, ok: %v, err: %v", ok, err)
 			}
 		}
@@ -334,39 +334,39 @@ func (handler *EventHandler) handleStartContainer_0() {
 }
 
 //!deprecated
-func containerInfoForStart_0(cli *client.Client, c_json types.ContainerJSON) (map[string]string, map[string]interface{}, error) {
-	containerid := c_json.ID
-	mounts := c_json.Mounts
+func containerInfoForStart_0(cli *client.Client, cJSON types.ContainerJSON) (map[string]string, map[string]interface{}, error) {
+	containerid := cJSON.ID
+	mounts := cJSON.Mounts
 	logrus.Infof("mounts: %v", mounts)
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = ""
 	}
-	config := c_json.Config
-	app_id, taskid, appname := "", "", "app.tar"
+	config := cJSON.Config
+	appid, taskid, appname := "", "", "app.tar"
 	checkproto, checkpath := "", ""
 	hostpath, exists, md5, buildnum := "", "0", "", ""
 	logrus.Infof("-----------env")
 	for _, e := range config.Env {
-		e_array := strings.Split(e, "=")
-		if e_array[0] == "MARATHON_APP_ID" {
-			logrus.Infof("MARATHON_APP_ID: %s", e_array[1])
-			app_info := strings.Split(e_array[1], ".")
-			app_id = strings.Trim(app_info[0], "/")
-		} else if e_array[0] == "PACKAGE_CHECK_PROTO" {
-			if e_array[1] == "HTTP" || e_array[1] == "COMMAND" {
-				checkproto = e_array[1]
+		eArray := strings.Split(e, "=")
+		if eArray[0] == "MARATHON_APP_ID" {
+			logrus.Infof("MARATHON_APP_ID: %s", eArray[1])
+			appInfo := strings.Split(eArray[1], ".")
+			appid = strings.Trim(appInfo[0], "/")
+		} else if eArray[0] == "PACKAGE_CHECK_PROTO" {
+			if eArray[1] == "HTTP" || eArray[1] == "COMMAND" {
+				checkproto = eArray[1]
 				logrus.Infof("PACKAGE_CHECK_PROTO: %s", checkproto)
 			} else {
 				checkproto = ""
 				logrus.Infof("PACKAGE_CHECK_PROTO: %s", "None")
 			}
-		} else if e_array[0] == "PACKAGE_CHECK_PATH" {
-			checkpath = e_array[1]
-		} else if e_array[0] == "MESOS_TASK_ID" {
-			taskid = e_array[1]
-		} else if e_array[0] == "PKG" {
-			appname = e_array[1]
+		} else if eArray[0] == "PACKAGE_CHECK_PATH" {
+			checkpath = eArray[1]
+		} else if eArray[0] == "MESOS_TASK_ID" {
+			taskid = eArray[1]
+		} else if eArray[0] == "PKG" {
+			appname = eArray[1]
 		}
 	}
 	logrus.Infof("-----mounts")
@@ -402,8 +402,8 @@ func containerInfoForStart_0(cli *client.Client, c_json types.ContainerJSON) (ma
 			}
 		}
 	}
-	logrus.Infof("---appid: %s, hostpath: %s", app_id, hostpath)
-	if app_id == "" || hostpath == "" {
+	logrus.Infof("---appid: %s, hostpath: %s", appid, hostpath)
+	if appid == "" || hostpath == "" {
 		return nil, nil, nil
 	}
 	conf := common.GetSettings()
@@ -413,7 +413,7 @@ func containerInfoForStart_0(cli *client.Client, c_json types.ContainerJSON) (ma
 	if err != nil {
 		logrus.Errorf("Get host ip error: ", err)
 	}
-	tags := map[string]string{"appid": app_id}
+	tags := map[string]string{"appid": appid}
 	fields := map[string]interface{}{
 		"containerid": containerid,
 		"host":        fmt.Sprintf("%s", host),
