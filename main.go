@@ -40,12 +40,12 @@ func main() {
 		}
 	}()
 
-	logrus.Infof("start listening...")
 	cm := controllers.ControllerManager{}
 	controller := controllers.NewDockerEventController()
 	controllers := make([]common.Controller, 0)
 	controllers = append(controllers, controller)
-	cm.Register(controllers)
+	cm.RegisterAll(controllers)
+	cm.StartAll()
 
 	//start http server for health check and pprof
 	conf := common.GetSettings()

@@ -97,7 +97,7 @@ func (c *DockerEventController) handleContainerEvent() error {
 			return errors.New("controller receives stop signal")
 		}
 	}
-	return nil
+	// return nil
 }
 
 func (c *DockerEventController) dealEvent(redisCli *redis.Client, cli *client.Client, event events.Message) error {
@@ -202,7 +202,7 @@ func containerInfoForStart(cli *client.Client, cJSON types.ContainerJSON) (map[s
 	info["host"] = fmt.Sprintf("%s", host)
 	info["hostname"] = hostname
 	info["time"] = time.Now().String()
-	logrus.Infof("app version info: %v", info)
+	logrus.Infof("info: %v", info)
 	return info, nil
 }
 
