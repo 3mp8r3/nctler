@@ -1,6 +1,8 @@
 package common
 
-type BasePlugin interface {
-	Init() error
-	GetPluginName() string
+// Controller is a infinite loop
+type Controller interface {
+	Start() error
+	Stop()
+	GetControllerName() string
 }

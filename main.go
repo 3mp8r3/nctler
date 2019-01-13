@@ -3,21 +3,22 @@ package main
 import (
 	"flag"
 	"fmt"
-	//"net/http"
-	//_ "net/http/pprof"
+	"net/http"
 	"os"
 	"os/signal"
 
 	"node/common"
-	//"node/handler"
-	"node/plugins"
+	"node/controllers"
+	"node/handler"
 
 	"github.com/Sirupsen/logrus"
-	//"github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 var (
+	// GitCommit git commit id
 	GitCommit = "Unknown"
+	// BuildTime build time
 	BuildTime = "Unknown"
 )
 
@@ -40,27 +41,28 @@ func main() {
 	}()
 
 	logrus.Infof("start listening...")
-	pm := plugins.PluginManager{}
-	plugin := plugins.EventHandler{}
-	plugins := make([]common.BasePlugin, 0)
-	plugins = append(plugins, &plugin)
-	pm.RegPlugins(plugins)
+	cm := controllers.ControllerManager{}
+	controller := controllers.NewDockerEventController()
+	controllers := make([]common.Controller, 0)
+	controllers = append(controllers, controller)
+	cm.Register(controllers)
 
-	start http server for health check and pprof
-		conf := common.GetSettings()
-		pprof_port := conf.Getv("SERVICE_PORT")
-		r := handler.Resource{}
-		router := mux.NewRouter()
-		r.Register(router)
-		r.AttachProfiler(router)
-		fmt.Println(http.ListenAndServe(":"+pprof_port, router))
-		go func() {
-			fmt.Println(http.ListenAndServe(":"+pprof_port, router))
-		}()
+	//start http server for health check and pprof
+	conf := common.GetSettings()
+	pprofPort := conf.Getv("SERVICE_PORT")
+	r := handler.Resource{}
+	router := mux.NewRouter()
+	r.Register(router)
+	r.AttachProfiler(router)
+	fmt.Println(http.ListenAndServe(":"+pprofPort, router))
+	go func() {
+		fmt.Println(http.ListenAndServe(":"+pprofPort, router))
+	}()
 
 	Run()
 }
 
+// Run run process
 func Run() {
 	exit := make(chan os.Signal, 0)
 	signal.Notify(exit, os.Kill, os.Interrupt)
