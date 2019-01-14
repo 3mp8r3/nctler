@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"node/common"
-	"node/utils"
+	"github.com/maoqide/nctler/common"
+	"github.com/maoqide/nctler/utils"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/docker/docker/api/types"

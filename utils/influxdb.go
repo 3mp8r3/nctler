@@ -6,7 +6,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/influxdata/influxdb/client/v2"
 
-	"node/common"
+	"github.com/maoqide/nctler/common"
 )
 
 var conf *common.Settings

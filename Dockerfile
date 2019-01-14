@@ -1,3 +1,3 @@
 FROM alpine:3.1
-ADD ./node /root/node
-CMD ["./root/node"]
+ADD ./nctler /root/nctler
+CMD ["./root/nctler"]

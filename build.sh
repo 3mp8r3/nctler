@@ -26,7 +26,7 @@ GIT_COMMIT=$(git rev-parse --short HEAD || echo "GitNotFound")
 BUILD_TIME=$(date +%FT%T%z)
 echo $GIT_COMMIT $BUILD_TIME
 LDFLAGS="-X main.GitCommit=${GIT_COMMIT} -X main.BuildTime=${BUILD_TIME}"
-CGO_ENABLED=0 go build -ldflags "${LDFLAGS}" -a -o ${HOME}/node ${HOME}/main.go
+CGO_ENABLED=0 go build -ldflags "${LDFLAGS}" -a -o ${HOME}/nctler ${HOME}/main.go
 
 if [[ $? -ne 0 ]]; then
 	#build error

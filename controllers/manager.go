@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"node/common"
+	"github.com/maoqide/nctler/common"
 
 	"github.com/Sirupsen/logrus"
 )

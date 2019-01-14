@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/signal"
 
-	"node/common"
-	"node/controllers"
-	"node/handler"
+	"github.com/maoqide/nctler/common"
+	"github.com/maoqide/nctler/controllers"
+	"github.com/maoqide/nctler/handler"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"

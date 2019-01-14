@@ -1,6 +1,6 @@
 timestamp=$(shell date +%Y%m%d)
 cur_path=$(shell cd ../ && pwd)
-image_name=maoqide/node:${timestamp}
+image_name=maoqide/nctler:dev-${timestamp}
 help:
 	@echo ''
 	@echo 'Optional Commands: '
