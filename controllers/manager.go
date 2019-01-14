@@ -15,6 +15,11 @@ type ControllerManager struct {
 	controllers map[string]common.Controller
 }
 
+// NewControllerManager create ControllerManager
+func NewControllerManager() *ControllerManager {
+	return &ControllerManager{controllers: make(map[string]common.Controller)}
+}
+
 func (cm *ControllerManager) register(controller common.Controller) error {
 	name := controller.GetControllerName()
 	if _, found := cm.controllers[name]; found {
@@ -32,7 +37,7 @@ func (cm *ControllerManager) RegisterAll(controllers []common.Controller) []erro
 
 	res := make([]error, len(controllers))
 	if cm.controllers == nil {
-		cm.controllers = map[string]common.Controller{}
+		cm.controllers = make(map[string]common.Controller)
 	}
 
 	for _, controller := range controllers {
@@ -51,6 +56,7 @@ func (cm *ControllerManager) RegisterAll(controllers []common.Controller) []erro
 
 // StartAll start all controllers
 func (cm *ControllerManager) StartAll() {
+	fmt.Println("asas", cm.controllers)
 	for _, c := range cm.controllers {
 		go c.Start()
 	}

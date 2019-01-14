@@ -1,4 +1,4 @@
-package controllers
+package docker
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/maoqide/nctler/common"
+	"github.com/maoqide/nctler/controllers"
 	"github.com/maoqide/nctler/utils"
 
 	"github.com/Sirupsen/logrus"
@@ -25,6 +26,13 @@ var (
 	chanLength     int
 	dockerEndpoint string
 	dockerVersion  string
+	eventOptions   = map[string]string{
+		// value: filter
+		events.ContainerEventType: "type",
+		"start":                   "event",
+		"stop":                    "event",
+		"kill":                    "event",
+	}
 )
 
 const (
@@ -34,46 +42,38 @@ const (
 	RedisKeyExpire = 7 * 24 * 3600
 )
 
-var (
-	eventOptions = map[string]string{
-		// value: filter
-		events.ContainerEventType: "type",
-		"start":                   "event",
-		"stop":                    "event",
-		"kill":                    "event",
-	}
-)
-
 func init() {
+	fmt.Println("as")
 	conf = common.GetSettings()
 	chanLength = conf.GetInt("CHAN_LENGTH")
 	dockerEndpoint = conf.Getv("DOCKER_ENDPOINT")
 	dockerVersion = conf.Getv("DOCKER_VERSION")
+	controllers.RegisterDefault(NewEventHandler())
 }
 
-// DockerEventController handle docker event
-type DockerEventController struct {
+// EventHandler handle docker event
+type EventHandler struct {
 	exit chan struct{}
 }
 
-// NewDockerEventController create DockerEventController
-func NewDockerEventController() *DockerEventController {
-	return &DockerEventController{exit: make(chan struct{})}
+// NewEventHandler create EventHandler
+func NewEventHandler() *EventHandler {
+	return &EventHandler{exit: make(chan struct{})}
 }
 
 // Start start controller
-func (c *DockerEventController) Start() error {
-	logrus.Infof("DockerEventController started...")
+func (c *EventHandler) Start() error {
+	logrus.Infof("EventHandler started...")
 	err := c.handleContainerEvent()
 	return err
 }
 
 // GetControllerName get name of controller
-func (c *DockerEventController) GetControllerName() string {
+func (c *EventHandler) GetControllerName() string {
 	return "dockerEventHandler"
 }
 
-func (c *DockerEventController) handleContainerEvent() error {
+func (c *EventHandler) handleContainerEvent() error {
 	eventChan := make(chan events.Message, chanLength)
 	redisCli, err := utils.GetRedisClient()
 	if err != nil {
@@ -93,14 +93,14 @@ func (c *DockerEventController) handleContainerEvent() error {
 			logrus.Infof("start handle event: %s", event)
 			go c.dealEvent(redisCli, dockerCli, event)
 		case <-c.exit:
-			logrus.Errorf("DockerEventController exited.")
+			logrus.Errorf("EventHandler exited.")
 			return errors.New("controller receives stop signal")
 		}
 	}
 	// return nil
 }
 
-func (c *DockerEventController) dealEvent(redisCli *redis.Client, cli *client.Client, event events.Message) error {
+func (c *EventHandler) dealEvent(redisCli *redis.Client, cli *client.Client, event events.Message) error {
 	logrus.Infof("Dealing docker  %s event.", event.Action)
 	cJSON, err := cli.ContainerInspect(context.Background(), event.ID)
 	if err != nil {
@@ -126,7 +126,7 @@ func (c *DockerEventController) dealEvent(redisCli *redis.Client, cli *client.Cl
 	return err
 }
 
-func (c *DockerEventController) writeEventChan(cli *client.Client, eventChan chan events.Message) {
+func (c *EventHandler) writeEventChan(cli *client.Client, eventChan chan events.Message) {
 	logrus.Infof("-------------------writing event nessage to channel------------------------")
 	args := filters.NewArgs()
 	for name, value := range eventOptions {
@@ -207,6 +207,6 @@ func containerInfoForStart(cli *client.Client, cJSON types.ContainerJSON) (map[s
 }
 
 // Stop stop controller
-func (c *DockerEventController) Stop() {
+func (c *EventHandler) Stop() {
 	close(c.exit)
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/maoqide/nctler/common"
 	"github.com/maoqide/nctler/controllers"
+	_ "github.com/maoqide/nctler/controllers/docker"
 	"github.com/maoqide/nctler/handler"
 
 	"github.com/Sirupsen/logrus"
@@ -40,11 +41,13 @@ func main() {
 		}
 	}()
 
-	cm := controllers.ControllerManager{}
-	controller := controllers.NewDockerEventController()
-	controllers := make([]common.Controller, 0)
-	controllers = append(controllers, controller)
-	cm.RegisterAll(controllers)
+	// cm := controllers.NewControllerManager()
+	// controller := dockerctl.NewEventController()
+	// controllers := make([]common.Controller, 0)
+	// controllers = append(controllers, controller)
+	// cm.RegisterAll(controllers)
+	// cm.StartAll()
+	cm := controllers.DefaultControllerManager()
 	cm.StartAll()
 
 	//start http server for health check and pprof
