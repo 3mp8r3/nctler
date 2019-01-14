@@ -43,7 +43,6 @@ const (
 )
 
 func init() {
-	fmt.Println("as")
 	conf = common.GetSettings()
 	chanLength = conf.GetInt("CHAN_LENGTH")
 	dockerEndpoint = conf.Getv("DOCKER_ENDPOINT")
