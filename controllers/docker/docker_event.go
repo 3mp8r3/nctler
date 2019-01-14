@@ -62,6 +62,12 @@ func NewEventHandler() *EventHandler {
 
 // Start start controller
 func (c *EventHandler) Start() error {
+	defer func() {
+		logrus.Infof("EventHandler panic...")
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 	logrus.Infof("EventHandler started...")
 	err := c.handleContainerEvent()
 	return err

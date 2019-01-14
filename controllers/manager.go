@@ -56,9 +56,9 @@ func (cm *ControllerManager) RegisterAll(controllers []common.Controller) []erro
 
 // StartAll start all controllers
 func (cm *ControllerManager) StartAll() {
-	fmt.Println("asas", cm.controllers)
 	for _, c := range cm.controllers {
 		go c.Start()
+		logrus.Infof("%s started.", c.GetControllerName())
 	}
 	// go func() {
 	// 	time.Sleep(10 * time.Second)
@@ -70,5 +70,6 @@ func (cm *ControllerManager) StartAll() {
 func (cm *ControllerManager) StopAll() {
 	for _, c := range cm.controllers {
 		c.Stop()
+		logrus.Infof("%s stoped.", c.GetControllerName())
 	}
 }
