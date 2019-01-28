@@ -2,80 +2,181 @@
 
 
 [[projects]]
+  digest = "1:f9ae348e1f793dcf9ed930ed47136a67343dbd6809c5c91391322267f4476892"
   name = "github.com/Microsoft/go-winio"
   packages = ["."]
-  revision = "3b8b3c98b207f95fe0cd6c7c311a9ac497ba7c0f"
-  version = "v0.3.3"
+  pruneopts = "UT"
+  revision = "97e4973ce50b2ff5f09635a57e2b88a037aae829"
+  version = "v0.4.11"
 
 [[projects]]
+  digest = "1:f3b6664d93ffaee13d93f1dcab4f30ce64204c4b24dda73695ecc8e686645d1b"
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
-  revision = "418b41d23a1bf978c06faea5313ba194650ac088"
-  version = "v0.8.7"
+  pruneopts = "UT"
+  revision = "d26492970760ca5d33129d2d799e34be5c4782eb"
+  version = "v0.11.0"
 
 [[projects]]
+  digest = "1:767be9f40efeaa89519a1b7d04bcc1e841760466bdd481b4b4cca63a00a1eef8"
   name = "github.com/docker/distribution"
-  packages = ["digest","reference"]
-  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
-  version = "v2.6.2"
+  packages = [
+    "digestset",
+    "reference",
+  ]
+  pruneopts = "UT"
+  revision = "b38e5838b7b2f2ad48e06ec4b500011976080621"
 
 [[projects]]
+  digest = "1:2cf8e4f6eb200819e39ef5bda5753e3fdaab30bdcbb027a6589a00332c27a9b6"
   name = "github.com/docker/docker"
-  packages = ["api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/mount","api/types/network","api/types/reference","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","pkg/tlsconfig"]
-  revision = "092cba3727bb9b4a2f0e922cd6c0f93ea270e363"
-  version = "v1.13.1"
+  packages = [
+    "api",
+    "api/types",
+    "api/types/blkiodev",
+    "api/types/container",
+    "api/types/events",
+    "api/types/filters",
+    "api/types/image",
+    "api/types/mount",
+    "api/types/network",
+    "api/types/registry",
+    "api/types/strslice",
+    "api/types/swarm",
+    "api/types/time",
+    "api/types/versions",
+    "api/types/volume",
+    "client",
+    "pkg/ioutils",
+    "pkg/longpath",
+    "pkg/system",
+    "pkg/tlsconfig",
+  ]
+  pruneopts = "UT"
+  revision = "90d35abf7b3535c1c319c872900fbd76374e521c"
+  version = "v17.05.0-ce-rc3"
 
 [[projects]]
+  digest = "1:1deed5e0f29a6b042688c22c7fb705f3cc265e82e0ec55818f32404d334ac6a9"
   name = "github.com/docker/go-connections"
-  packages = ["nat","sockets","tlsconfig"]
-  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
-  version = "v0.3.0"
+  packages = [
+    "nat",
+    "sockets",
+    "tlsconfig",
+  ]
+  pruneopts = "UT"
+  revision = "e15c02316c12de00874640cd76311849de2aeed5"
 
 [[projects]]
+  digest = "1:57d39983d01980c1317c2c5c6dd4b5b0c4a804ad2df800f2f6cbcd6a6d05f6ca"
   name = "github.com/docker/go-units"
   packages = ["."]
-  revision = "0dadbb0345b35ec7ef35e228dabb8de89a65bf52"
-  version = "v0.3.2"
+  pruneopts = "UT"
+  revision = "9e638d38cf6977a37a8ea0078f3ee75a7cdb2dd1"
 
 [[projects]]
-  name = "github.com/go-redis/redis"
-  packages = [".","internal","internal/consistenthash","internal/hashtag","internal/pool","internal/proto"]
-  revision = "4021ace05686f632ff17fd824bbed229fc474cf8"
-  version = "v6.8.2"
-
-[[projects]]
-  name = "github.com/gorilla/context"
+  digest = "1:116357232670e348093a817cadb14c650a9d598b569365f3a114c48f26922937"
+  name = "github.com/docker/libtrust"
   packages = ["."]
-  revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
-  version = "v1.1"
+  pruneopts = "UT"
+  revision = "9cbd2a1374f46905c68a4eb3694a130610adc62a"
 
 [[projects]]
+  digest = "1:ad53d1f710522a38d1f0e5e0a55a194b1c6b2cd8e84313568e43523271f0cf62"
+  name = "github.com/go-redis/redis"
+  packages = [
+    ".",
+    "internal",
+    "internal/consistenthash",
+    "internal/hashtag",
+    "internal/pool",
+    "internal/proto",
+    "internal/util",
+  ]
+  pruneopts = "UT"
+  revision = "22be8a3eaf992c828cecb69dc07348313bf08d2e"
+  version = "v6.15.1"
+
+[[projects]]
+  digest = "1:ca59b1175189b3f0e9f1793d2c350114be36eaabbe5b9f554b35edee1de50aea"
   name = "github.com/gorilla/mux"
   packages = ["."]
-  revision = "53c1911da2b537f792e7cafcb446b05ffe33b996"
-  version = "v1.6.1"
+  pruneopts = "UT"
+  revision = "a7962380ca08b5a188038c69871b8d3fbdf31e89"
+  version = "v1.7"
 
 [[projects]]
+  digest = "1:718c57979a9197414a044fff2028e57cb9fe145069e4f507059755bfe87f1bfe"
   name = "github.com/influxdata/influxdb"
-  packages = ["client/v2","models","pkg/escape"]
-  revision = "6d2685d1738277a1c2672fc58df7994627769be6"
-  version = "v1.4.2"
+  packages = [
+    "client/v2",
+    "models",
+    "pkg/escape",
+  ]
+  pruneopts = "UT"
+  revision = "698dbc789aff13c2678357a6b93ff73dd7136571"
+  version = "v1.7.3"
 
 [[projects]]
+  digest = "1:937258f1293bc9295b4789b0abea5b4ec030e3caecb65a4e1dc0b6999957a5ed"
+  name = "github.com/influxdata/platform"
+  packages = [
+    "models",
+    "pkg/escape",
+  ]
+  pruneopts = "UT"
+  revision = "0f79e4ea3248354c789cba274542e0a8e55971db"
+
+[[projects]]
+  digest = "1:37423212694a4316f48e0bbac8e4f1fd366a384a286fbaa7d80baf99d86f0416"
+  name = "github.com/opencontainers/go-digest"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a6d0ee40d4207ea02364bd3b9e8e77b9159ba1eb"
+
+[[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  pruneopts = "UT"
+  revision = "839d9e913e063e28dfd0e6c7b7512793e0a48be9"
 
 [[projects]]
-  branch = "release-branch.go1.6"
+  branch = "master"
+  digest = "1:63c7bce98d2534e119bf2830e5152b3d5d58d9d1278d5184f0d05641996e9c8f"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp","proxy"]
-  revision = "62685c2d7ca23c807425dca88b11a3e2323dab41"
+  packages = [
+    "context",
+    "context/ctxhttp",
+    "internal/socks",
+    "proxy",
+  ]
+  pruneopts = "UT"
+  revision = "d26f9f9a57f3fab6a695bec0d84433c2c50f8bbf"
+
+[[projects]]
+  digest = "1:9141912e7e875241bccd1ef2303cf36a634a35a406f7f9ce4f6713131bd39511"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7346e8d2e2dba61769653582f80e6023a524d45a08cb5f101f3f18d43de858ce"
+  input-imports = [
+    "github.com/Sirupsen/logrus",
+    "github.com/docker/docker/api/types",
+    "github.com/docker/docker/api/types/events",
+    "github.com/docker/docker/api/types/filters",
+    "github.com/docker/docker/client",
+    "github.com/go-redis/redis",
+    "github.com/gorilla/mux",
+    "github.com/influxdata/influxdb/client/v2",
+    "golang.org/x/net/context",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -69,14 +69,13 @@ func HTTPGet(url string) ([]byte, error) {
 // DockerExec exec container
 func DockerExec(cli *client.Client, containerid string, cmd []string) ([]byte, error) {
 	execConfig := types.ExecConfig{Cmd: cmd, AttachStderr: true, AttachStdout: true}
-	execStartCheck := types.ExecStartCheck{}
 	//execStartCheck := types.ExecStartCheck{}
 	ctx := context.Background()
 	execResp, err := cli.ContainerExecCreate(ctx, containerid, execConfig)
 	if err != nil {
 		return nil, err
 	} else {
-		resp, err := cli.ContainerExecAttach(ctx, execResp.ID, execStartCheck)
+		resp, err := cli.ContainerExecAttach(ctx, execResp.ID, execConfig)
 		if err != nil {
 			return nil, err
 		}
