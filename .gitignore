@@ -1,3 +1,5 @@
-node
+nctler
 vendor/*
 _vendor*/*
+.vscode/*
+debug
