@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/maoqide/nctler/common"
@@ -52,7 +53,8 @@ func init() {
 
 // EventHandler handle docker event
 type EventHandler struct {
-	exit chan struct{}
+	exit     chan struct{}
+	exitOnce sync.Once
 }
 
 // NewEventHandler create EventHandler
@@ -213,5 +215,7 @@ func containerInfoForStart(cli *client.Client, cJSON types.ContainerJSON) (map[s
 
 // Stop stop controller
 func (c *EventHandler) Stop() {
-	close(c.exit)
+	c.exitOnce.Do(func() {
+		close(c.exit)
+	})
 }
