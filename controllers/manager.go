@@ -26,7 +26,7 @@ func (cm *ControllerManager) register(controller common.Controller) error {
 		return fmt.Errorf("controller %s: registered more than once", name)
 	}
 	cm.controllers[name] = controller
-	logrus.Infof("success registered controller %s", name)
+	// logrus.Debugf("success registered controller %s", name)
 	return nil
 }
 
