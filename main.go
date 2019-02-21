@@ -4,13 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
 
 	"github.com/maoqide/nctler/common"
 	"github.com/maoqide/nctler/controllers"
 	_ "github.com/maoqide/nctler/controllers/docker"
 	"github.com/maoqide/nctler/handler"
+	"github.com/maoqide/nctler/utils"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
@@ -61,25 +60,8 @@ func main() {
 	router := mux.NewRouter()
 	r.Register(router)
 	r.AttachProfiler(router)
-	// fmt.Println(http.ListenAndServe(":"+pprofPort, router))
 	go func() {
 		fmt.Println(http.ListenAndServe(":"+pprofPort, router))
 	}()
-	Run(cm.StopAll)
-}
-
-// Run run process
-func Run(f func()) {
-	logrus.Infof("running...")
-	exit := make(chan os.Signal)
-	// signal.Notify(exit, os.Kill, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT)
-	signal.Notify(exit, os.Kill, os.Interrupt)
-	for {
-		select {
-		case <-exit:
-			logrus.Errorf("main function exited.")
-			f()
-			return
-		}
-	}
+	utils.Wait(cm.StopAll)
 }

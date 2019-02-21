@@ -9,7 +9,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
@@ -87,5 +89,21 @@ func DockerExec(cli *client.Client, containerid string, cmd []string) ([]byte, e
 		}
 		// trim extra bytess
 		return output[8:i], nil
+	}
+}
+
+// Wait run process
+func Wait(f func()) {
+	logrus.Infof("running...")
+	exit := make(chan os.Signal)
+	// signal.Notify(exit, os.Kill, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT)
+	signal.Notify(exit, os.Kill, os.Interrupt)
+	for {
+		select {
+		case <-exit:
+			logrus.Errorf("main function exited.")
+			f()
+			return
+		}
 	}
 }
