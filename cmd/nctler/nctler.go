@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Sirupsen/logrus"
 	"fmt"
 	"net/http"
 	"os"
@@ -73,7 +74,7 @@ func Run(cm *controllers.ControllerManager) {
 
 // ServeHTTP start http server for health check and pprof
 func ServeHTTP(pprofPort string) {
-	fmt.Printf("server http on \":%s\"\n", pprofPort)
+	logrus.Infof("server http on \":%s\"\n", pprofPort)
 	r := handler.Resource{}
 	router := mux.NewRouter()
 	r.Register(router)
